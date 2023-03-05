@@ -1,8 +1,9 @@
 package vsu.cs.tech.mongorestdemo.services;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import vsu.cs.tech.mongorestdemo.models.MetroTimetable;
+import vsu.cs.tech.mongorestdemo.repositories.MetroTimetableRepository;
 import vsu.cs.tech.mongorestdemo.repositories.StationRepository;
 import vsu.cs.tech.mongorestdemo.repositories.TrainRepository;
 
@@ -11,22 +12,58 @@ import java.util.List;
 @Service
 public class MetroTimetableService {
 
-    @Autowired
-    private TrainRepository trainRepository;
-    @Autowired
-    private StationRepository stationRepository;
+    private final TrainService trainService;
+    private final StationService stationService;
+    private final MetroTimetableRepository repository;
 
-    public MetroTimetable getFullTimetable(MetroTimetable smallTable) {
-        smallTable.setTrain(trainRepository.findById(Integer.parseInt(smallTable.getTrain_id())).orElse(null));
-        smallTable.setStation(stationRepository.findById(Integer.parseInt(smallTable.getStation_id())).orElse(null));
-        return smallTable;
+    public MetroTimetableService(TrainService trainService, StationService stationService, MetroTimetableRepository repository) {
+        this.trainService = trainService;
+        this.stationService = stationService;
+        this.repository = repository;
     }
 
-    public List<MetroTimetable> getListOfFullTimetables(List<MetroTimetable> smallTables) {
-        for (MetroTimetable m: smallTables) {
-            m = getFullTimetable(m);
-        }
-        return smallTables;
+    public List<MetroTimetable> getAllTimetables() {
+        return repository.findAll();
     }
 
+    public MetroTimetable getTimetableById(Integer id) throws IllegalArgumentException {
+        return repository.findById(id).orElseThrow(() -> new IllegalArgumentException("Такого расписания не существует"));
+    }
+
+    public List<MetroTimetable> getTimetablesForTrain(Integer trainId) {
+        return repository.findAllByTrainId(trainId);
+    }
+
+    public List<MetroTimetable> getTimetablesForStation(Integer stationId) {
+        return repository.findAllByStationId(stationId);
+    }
+
+    public MetroTimetable addTimetable(MetroTimetable newTimetable, Integer trainId, Integer stationId) throws IllegalArgumentException{
+        newTimetable.setTrain(trainService.getTrainById(trainId));
+        newTimetable.setStation(stationService.getStationById(stationId));
+        return repository.save(newTimetable);
+    }
+
+    public MetroTimetable updateExistingTimetable(Integer id,
+                                                  MetroTimetable newTimetable,
+                                                  Integer stationId,
+                                                  Integer trainId)  throws IllegalArgumentException {
+        return repository.findById(id).map(t -> {
+            if (trainId > 0) {
+                t.setTrain(trainService.getTrainById(trainId));
+            }
+            if (stationId > 0) {
+                t.setStation(stationService.getStationById(stationId));
+            }
+            t.setTime(newTimetable.getTime());
+            return repository.save(t);
+        }).orElseThrow(() -> new IllegalArgumentException("Такого расписания не существует"));
+    }
+
+    public ResponseEntity<?> deleteExistingTimetable(Integer id) {
+        return repository.findById(id).map(t -> {
+            repository.delete(t);
+            return ResponseEntity.ok().build();
+        }).orElseThrow(() -> new IllegalArgumentException("Такого расписания не существует"));
+    }
 }

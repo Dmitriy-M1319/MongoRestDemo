@@ -1,31 +1,32 @@
 package vsu.cs.tech.mongorestdemo.models;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import net.minidev.json.annotate.JsonIgnore;
 
-@Document(collection = "trains")
-public class Train {
+import java.io.Serializable;
+import java.util.List;
+
+@Entity
+@Getter
+@Setter
+@NoArgsConstructor
+@Table(name = "trains")
+public class Train implements Serializable {
     @Id
-    private int id;
+    @GeneratedValue()
+    @Column(name = "train_id")
+    private Long trainId;
+    @Column
     private int number;
+
+    @OneToMany(mappedBy = "train")
+    @JsonIgnore
+    private List<MetroTimetable> timetables;
 
     public Train(int number) {
         this.number = number;
-    }
-
-    public int getNumber() {
-        return number;
-    }
-
-    public void setNumber(int number) {
-        this.number = number;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 }

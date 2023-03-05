@@ -1,12 +1,12 @@
 package vsu.cs.tech.mongorestdemo.controllers;
 
+import net.minidev.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 import vsu.cs.tech.mongorestdemo.models.Train;
 import vsu.cs.tech.mongorestdemo.repositories.TrainRepository;
+import vsu.cs.tech.mongorestdemo.services.TrainService;
 
 import java.util.List;
 
@@ -14,20 +14,65 @@ import java.util.List;
 public class TrainController {
 
     @Autowired
-    private TrainRepository repository;
+    private TrainService service;
 
     @GetMapping("/trains")
     public List<Train> findAll() {
-        return repository.findAll();
+        return service.getAllTrains();
     }
 
     @GetMapping("/trains/{id}")
-    public Train findTrainById(@PathVariable Integer id) throws Exception {
-        return repository.findById(id).orElseThrow(() -> new Exception("Такого поезда не найдено"));
+    public ResponseEntity<?> findTrainById(@PathVariable Integer id) {
+        try {
+            return ResponseEntity.ok(service.getTrainById(id));
+        } catch (IllegalArgumentException e) {
+            JSONObject resp = new JSONObject();
+            resp.put("message", e.getMessage());
+            return ResponseEntity.badRequest().body(resp);
+        }
     }
 
     @GetMapping("/trains/number/{number}")
-    public Train findTrainByNumber(@PathVariable Integer number) {
-        return repository.findTrainByNumber(number);
+    public ResponseEntity<?> findTrainByNumber(@PathVariable Integer number) {
+        try {
+            return ResponseEntity.ok(service.getTrainByNumber(number));
+        } catch (IllegalArgumentException e) {
+            JSONObject resp = new JSONObject();
+            resp.put("message", e.getMessage());
+            return ResponseEntity.badRequest().body(resp);
+        }
+    }
+
+    @PostMapping("/trains/create")
+    public ResponseEntity<?> createTrain(@RequestBody Train train) {
+        try {
+            return ResponseEntity.ok(service.addTrain(train));
+        } catch (IllegalArgumentException e) {
+            JSONObject resp = new JSONObject();
+            resp.put("message", e.getMessage());
+            return ResponseEntity.badRequest().body(resp);
+        }
+    }
+
+    @PutMapping("/trains/{id}/update")
+    public ResponseEntity<?> updateTrain(@PathVariable Integer id, @RequestBody Train train) {
+        try {
+            return ResponseEntity.ok(service.updateExistingTrain(id, train));
+        } catch (IllegalArgumentException e) {
+            JSONObject resp = new JSONObject();
+            resp.put("message", e.getMessage());
+            return ResponseEntity.badRequest().body(resp);
+        }
+    }
+
+    @DeleteMapping("/trains/{id}/delete")
+    public ResponseEntity<?> deleteTrain(@PathVariable Integer id) {
+        try {
+            return ResponseEntity.ok(service.deleteExistingTrain(id));
+        } catch (IllegalArgumentException e) {
+            JSONObject resp = new JSONObject();
+            resp.put("message", e.getMessage());
+            return ResponseEntity.badRequest().body(resp);
+        }
     }
 }

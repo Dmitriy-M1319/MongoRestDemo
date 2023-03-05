@@ -1,41 +1,35 @@
 package vsu.cs.tech.mongorestdemo.models;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import net.minidev.json.annotate.JsonIgnore;
 
-@Document(collection = "stations")
-public class Station {
+import java.io.Serializable;
+import java.util.List;
+
+@Entity
+@Getter
+@Setter
+@NoArgsConstructor
+@Table(name = "stations")
+public class Station implements Serializable {
     @Id
-    private int id;
+    @GeneratedValue
+    @Column(name = "station_id")
+    private int stationId;
+    @Column
     private String name;
+    @Column
     private String color;
+
+    @OneToMany(mappedBy = "station")
+    @JsonIgnore
+    private List<MetroTimetable> timetableList;;
 
     public Station(String name, String color) {
         this.name = name;
-        this.color = color;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getColor() {
-        return color;
-    }
-
-    public void setColor(String color) {
         this.color = color;
     }
 }
