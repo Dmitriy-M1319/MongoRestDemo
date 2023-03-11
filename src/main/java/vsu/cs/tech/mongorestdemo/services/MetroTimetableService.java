@@ -4,8 +4,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import vsu.cs.tech.mongorestdemo.models.MetroTimetable;
 import vsu.cs.tech.mongorestdemo.repositories.MetroTimetableRepository;
-import vsu.cs.tech.mongorestdemo.repositories.StationRepository;
-import vsu.cs.tech.mongorestdemo.repositories.TrainRepository;
 
 import java.util.List;
 
@@ -55,7 +53,7 @@ public class MetroTimetableService {
             if (stationId > 0) {
                 t.setStation(stationService.getStationById(stationId));
             }
-            t.setTime(newTimetable.getTime());
+            t.setTimetable(newTimetable.getTimetable());
             return repository.save(t);
         }).orElseThrow(() -> new IllegalArgumentException("Такого расписания не существует"));
     }

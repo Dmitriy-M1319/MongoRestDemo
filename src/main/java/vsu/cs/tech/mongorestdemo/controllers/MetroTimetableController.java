@@ -13,8 +13,11 @@ import java.util.List;
 @RestController
 public class MetroTimetableController {
 
-    @Autowired
     private MetroTimetableService service;
+
+    public MetroTimetableController(MetroTimetableService service) {
+        this.service = service;
+    }
 
     @GetMapping("/timetable")
     public List<MetroTimetable> findAll() {

@@ -1,5 +1,6 @@
 package vsu.cs.tech.mongorestdemo.services;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import vsu.cs.tech.mongorestdemo.models.Train;
@@ -10,11 +11,9 @@ import java.util.List;
 @Service
 public class TrainService {
 
-    private final TrainRepository repository;
+    @Autowired
+    private TrainRepository repository;
 
-    public TrainService(TrainRepository repository) {
-        this.repository = repository;
-    }
 
     public List<Train> getAllTrains() {
         return repository.findAll();

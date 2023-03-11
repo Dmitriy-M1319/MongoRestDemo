@@ -1,12 +1,11 @@
 package vsu.cs.tech.mongorestdemo.models;
 
-import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 
+import jakarta.persistence.*;
 import java.io.Serializable;
 import java.time.LocalTime;
 
@@ -14,25 +13,21 @@ import java.time.LocalTime;
 @Getter
 @Setter
 @NoArgsConstructor
-@Table(name = "metro_timetables")
+@AllArgsConstructor
+@Table(name = "metro_timetable")
 public class MetroTimetable implements Serializable {
     @Id
     @GeneratedValue
-    private int id;
+    private Integer id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "train_id")
+    @ManyToOne()
+    @JoinColumn(name = "train_id", referencedColumnName = "id")
     private Train train;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "station_id", referencedColumnName = "station_id")
+    @ManyToOne()
+    @JoinColumn(name = "station_id", referencedColumnName = "id")
     private Station station;
-    @Column
-    private LocalTime time;
+    @Column(name = "timetable")
+    private LocalTime timetable;
 
-    public MetroTimetable(Train train, Station station, LocalTime time) {
-        this.train = train;
-        this.station = station;
-        this.time = time;
-    }
 }
 

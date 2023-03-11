@@ -1,11 +1,11 @@
 package vsu.cs.tech.mongorestdemo.models;
 
-import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import net.minidev.json.annotate.JsonIgnore;
 
+import jakarta.persistence.*;
 import java.io.Serializable;
 import java.util.List;
 
@@ -17,8 +17,8 @@ import java.util.List;
 public class Train implements Serializable {
     @Id
     @GeneratedValue()
-    @Column(name = "train_id")
-    private Long trainId;
+    @Column(name = "id")
+    private Integer trainId;
     @Column
     private int number;
 
