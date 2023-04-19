@@ -17,7 +17,7 @@ import java.time.LocalTime;
 @Table(name = "metro_timetable")
 public class MetroTimetable implements Serializable {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @ManyToOne()
