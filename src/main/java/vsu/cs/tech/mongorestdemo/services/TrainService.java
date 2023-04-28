@@ -33,7 +33,7 @@ public class TrainService {
 
     public Train updateExistingTrain(Integer id, Train newTrain) throws IllegalArgumentException {
         return repository.findById(id).map(t -> {
-            t.setNumber(newTrain.getNumber());
+            t.setTrainNumber(newTrain.getTrainNumber());
             return repository.save(t);
         }).orElseThrow(() -> new IllegalArgumentException("Такого поезда не существует"));
     }

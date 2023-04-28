@@ -14,6 +14,6 @@ public interface TrainRepository extends JpaRepository<Train, Integer> {
     List<Train> findAll();
     Optional<Train> findById(Integer id);
 
-    @Query(value = "select t from Train t where t.number = ?1")
+    @Query(value = "select t from Train t where t.trainNumber = ?1")
     Optional<Train> findTrainByNumber(Integer number);
 }

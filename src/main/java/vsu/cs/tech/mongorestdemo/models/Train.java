@@ -20,13 +20,13 @@ public class Train implements Serializable {
     @Column(name = "id")
     private Integer trainId;
     @Column
-    private int number;
+    private Integer trainNumber;
 
     @OneToMany(mappedBy = "train")
     @JsonIgnore
     private List<MetroTimetable> timetables;
 
-    public Train(int number) {
-        this.number = number;
+    public Train(int trainNumber) {
+        this.trainNumber = trainNumber;
     }
 }

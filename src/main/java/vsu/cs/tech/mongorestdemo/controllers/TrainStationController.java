@@ -22,7 +22,10 @@ public class TrainStationController {
 
     @PostMapping(path = "/create")
     public ResponseEntity<String> create(@RequestBody TrainStationDto dto) {
-        service.createTimetable(dto);
-        return ResponseEntity.ok("success");
+        //service.createTimetable(dto);
+        long trainId = service.createTrain(dto);
+        long stationId = service.createStation(dto);
+        long id = service.createTimetable(trainId, stationId, dto);
+        return ResponseEntity.ok(String.valueOf(id));
     }
 }

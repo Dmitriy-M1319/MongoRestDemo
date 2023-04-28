@@ -1,64 +1,45 @@
 package vsu.cs.tech.mongorestdemo.services;
 
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Service;
 import vsu.cs.tech.mongorestdemo.models.MetroTimetable;
 import vsu.cs.tech.mongorestdemo.models.Station;
 import vsu.cs.tech.mongorestdemo.models.Train;
 import vsu.cs.tech.mongorestdemo.models.TrainStationDto;
+import vsu.cs.tech.mongorestdemo.repositories.MetroJdbcRepository;
+import vsu.cs.tech.mongorestdemo.repositories.StationJdbcRepository;
+import vsu.cs.tech.mongorestdemo.repositories.TrainJdbcRepository;
 
-import java.sql.PreparedStatement;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class TrainStationDataService {
 
     private final JdbcTemplate template;
-    private final TrainService trainService;
-    private final StationService stationService;
-    private final MetroTimetableService metroService;
+    private final TrainJdbcRepository trainRepository;
+    private final StationJdbcRepository stationRepository;
+    private final MetroJdbcRepository metroRepository;
 
     public TrainStationDataService(JdbcTemplate template,
-                                   TrainService trainService,
-                                   StationService stationService,
-                                   MetroTimetableService metroService) {
+                                   TrainJdbcRepository repository,
+                                   StationJdbcRepository stationRepository,
+                                   MetroJdbcRepository metroRepository) {
         this.template = template;
-        this.trainService = trainService;
-        this.stationService = stationService;
-        this.metroService = metroService;
+        this.trainRepository = repository;
+        this.stationRepository = stationRepository;
+        this.metroRepository = metroRepository;
     }
 
     public long createTrain(TrainStationDto dto) {
-        String insertQuery = "INSERT INTO trains(number) VALUES(?)";
-        KeyHolder holder = new GeneratedKeyHolder();;
-        template.update(connection -> {
-            PreparedStatement ps  = connection
-                    .prepareStatement(insertQuery);
-            ps.setInt(1, dto.getTrainNumber());
-            return ps;
-        }, holder);
-        return (long) holder.getKey();
+        return trainRepository.saveCustom(dto.getTrainNumber());
     }
 
     public long createStation(TrainStationDto dto) {
-        String insertQuery = "INSERT INTO stations(name, color) VALUES(?, ?)";
-        KeyHolder holder = new GeneratedKeyHolder();;
-        template.update(connection -> {
-            PreparedStatement ps  = connection
-                    .prepareStatement(insertQuery);
-            ps.setString(1, dto.getStationName());
-            ps.setString(2, dto.getStationColor());
-            return ps;
-        }, holder);
-        return (long) holder.getKey();
+        return stationRepository.saveCustom(dto.getStationName(), dto.getStationColor());
     }
 
-    public void createTimetable(TrainStationDto dto) {
-        Train train = trainService.addTrain(new Train(dto.getTrainNumber()));
-        Station station = stationService.addStation(new Station(dto.getStationName(), dto.getStationColor()));
-        MetroTimetable inserted = new MetroTimetable();
-        inserted.setTimetable(dto.getTimetable());
-        MetroTimetable metroTimetable = metroService.addTimetable(inserted, train.getTrainId(), station.getStationId());
+    public long createTimetable(long trainId, long stationId, TrainStationDto dto) {
+       return metroRepository.saveCustom(trainId, stationId, dto.getTimetable());
     }
 }
